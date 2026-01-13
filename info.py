@@ -5,7 +5,7 @@ from Script import script
 id_pattern = re.compile(r'^.\d+$')
 
 # Bot information
-SESSION = environ.get('SESSION', 'TechVJBot')
+SESSION = environ.get('SESSION', 'yashfilterbot')
 API_ID = int(environ.get('API_ID', '30121899'))
 API_HASH = environ.get('API_HASH', 'd43eb6418b1a9a92fb658130394b0f8d')
 BOT_TOKEN = environ.get('BOT_TOKEN', "8500771739:AAETYv0srJ75A1ixWwbc1bFXG5zkyaCw-6M")
