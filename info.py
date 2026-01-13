@@ -8,7 +8,7 @@ id_pattern = re.compile(r'^.\d+$')
 SESSION = environ.get('SESSION', 'yashfilterbot')
 API_ID = int(environ.get('API_ID', '30121899'))
 API_HASH = environ.get('API_HASH', 'd43eb6418b1a9a92fb658130394b0f8d')
-BOT_TOKEN = environ.get('BOT_TOKEN', "8500771739:AAETYv0srJ75A1ixWwbc1bFXG5zkyaCw-6M")
+BOT_TOKEN = environ.get('BOT_TOKEN', "8570447061:AAGh2NEsPyyM5tMHzv2rosiBCqN7F8XEEbw")
 
 # Start Message Pictures
 PICS = (environ.get('PICS', 'https://t.me/yashtechpro/14')).split()
