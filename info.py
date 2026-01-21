@@ -55,7 +55,7 @@ FILE_STORE_CHANNEL = [int(ch) for ch in (environ.get('FILE_STORE_CHANNEL', '-100
 DELETE_CHANNELS = [int(dch) if id_pattern.search(dch) else dch for dch in environ.get('DELETE_CHANNELS', '0').split()]
 
 # MongoDB information - FIXED URL
-DATABASE_URI = environ.get('DATABASE_URI', "mongodb+srv://professorsergio110_db_user:LjzC4VO3bhNkLcgx@cluster0.axqhpx6.mongodb.net/?retryWrites=true&w=majority&ssl=false")
+DATABASE_URI = environ.get('DATABASE_URI', "mongodb+srv://hackingyashwant_db_user:RjIucgaU6RsJWPRU@cluster0.euy3vsq.mongodb.net/?retryWrites=true&w=majority&ssl=false")
 DATABASE_NAME = environ.get('DATABASE_NAME', "movie_hub_bot")
 COLLECTION_NAME = environ.get('COLLECTION_NAME', 'movies_collection')
 
