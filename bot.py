@@ -34,6 +34,9 @@ from TechVJ.bot import TechVJBot
 from TechVJ.util.keepalive import ping_server
 from TechVJ.bot.clients import initialize_clients
 
+# Import premium database
+from database.premium_db import premium_db
+
 class Bot:
     def __init__(self):
         self.techvj_bot = TechVJBot
@@ -43,7 +46,9 @@ class Bot:
         """Main method to start the bot"""
         try:
             print('\n')
-            print('Initializing Your Bot')
+            print('=' * 50)
+            print('🚀 Starting Premium FSUB Bot')
+            print('=' * 50)
             
             # First start TechVJBot asynchronously
             await self.start_techvj_bot()
@@ -51,6 +56,9 @@ class Bot:
             # Get bot info
             bot_info = await self.techvj_bot.get_me()
             logging.info(f"Bot Started as @{bot_info.username}")
+            
+            # Initialize premium database system
+            await self.initialize_premium_system()
             
             # Initialize clients
             await initialize_clients()
@@ -81,10 +89,8 @@ class Bot:
             # Start web server
             await self.start_web_server()
             
-            print("\n✅ Bot Successfully Started!")
-            print(f"🤖 Bot Username: @{bot_info.username}")
-            print(f"👤 Bot Name: {bot_info.first_name}")
-            print(f"🆔 Bot ID: {bot_info.id}")
+            # Print bot information
+            await self.print_bot_info(bot_info)
             
             # Keep bot in idle state
             await idle()
@@ -110,6 +116,30 @@ class Bot:
             print("Please check your configuration and try again.")
             raise
     
+    async def initialize_premium_system(self):
+        """Initialize premium and FSUB systems"""
+        try:
+            # Reset daily usage data
+            await premium_db.reset_daily_usage()
+            print("✅ Premium system initialized")
+            
+            # Check FSUB channels configuration
+            if len(FSUB_CHANNELS) < 4:
+                print(f"⚠️ WARNING: Only {len(FSUB_CHANNELS)} FSUB channels configured")
+                print("ℹ️ Bot requires 4 channels for FSUB system")
+            else:
+                print(f"✅ FSUB System: {len(FSUB_CHANNELS)} channels configured")
+            
+            # Print system status
+            print(f"⭐ Premium System: {'ENABLED' if PREMIUM_ENABLED else 'DISABLED'}")
+            print(f"🎯 Daily Free Limit: {DAILY_FREE_LIMIT} files")
+            print(f"🔗 Unique Links: {'ENABLED' if UNIQUE_LINK_ENABLED else 'DISABLED'}")
+            print(f"👑 Admins: {len(ADMINS)}")
+            
+        except Exception as e:
+            logging.error(f"Error initializing premium system: {e}")
+            print("⚠️ Error initializing premium system")
+    
     async def start_techvj_bot(self):
         """Start TechVJBot asynchronously"""
         try:
@@ -132,6 +162,7 @@ class Bot:
         files = glob.glob(ppath)
         
         print(f"\n📂 Loading Plugins...")
+        loaded_count = 0
         
         for file_path in files:
             try:
@@ -153,10 +184,27 @@ class Bot:
                 spec.loader.exec_module(module)
                 sys.modules[import_path] = module
                 
-                print(f"✅ Imported: {plugin_name}")
+                # Initialize FSUB manager if it's the fsub plugin
+                if plugin_name == "fsub":
+                    from plugins.fsub import setup_fsub
+                    setup_fsub(self.techvj_bot)
+                    print(f"✅ Imported & Initialized: {plugin_name}")
+                else:
+                    print(f"✅ Imported: {plugin_name}")
+                
+                loaded_count += 1
                 
             except Exception as e:
                 print(f"❌ Error loading plugin {plugin_name}: {e}")
+        
+        print(f"📊 Total plugins loaded: {loaded_count}")
+        
+        # Check for required plugins
+        required_plugins = ["fsub", "premium", "unique_links"]
+        for req_plugin in required_plugins:
+            plugin_file = Path(f"plugins/{req_plugin}.py")
+            if not plugin_file.exists():
+                print(f"⚠️ WARNING: Required plugin '{req_plugin}.py' not found")
     
     async def load_banned_data(self):
         """Load banned users and chats with MongoDB error handling"""
@@ -221,7 +269,7 @@ class Bot:
                 try:
                     k = await self.techvj_bot.send_message(
                         chat_id=ch, 
-                        text="**Bot Restarted**"
+                        text="**Bot Restarted**\n\n⚠️ New Features Added:\n• 4-Channel FSUB System\n• Premium & Referral System\n• Unique Link Generator\n• Daily Download Limits"
                     )
                     await k.delete()
                     print(f"✅ Status sent to channel: {ch}")
@@ -234,7 +282,7 @@ class Bot:
             try:
                 k = await self.techvj_bot.send_message(
                     chat_id=AUTH_CHANNEL, 
-                    text="**Bot Restarted**"
+                    text="**Bot Restarted**\n\n⚠️ FSUB System Active\nUsers must join all 4 channels"
                 )
                 await k.delete()
                 print(f"✅ Status sent to auth channel: {AUTH_CHANNEL}")
@@ -264,6 +312,42 @@ class Bot:
         except Exception as e:
             logging.error(f"Error starting web server: {e}")
             print("❌ Error starting web server")
+    
+    async def print_bot_info(self, bot_info):
+        """Print bot information"""
+        print("\n" + "=" * 50)
+        print("✅ Bot Successfully Started!")
+        print("=" * 50)
+        print(f"🤖 Bot Username: @{bot_info.username}")
+        print(f"👤 Bot Name: {bot_info.first_name}")
+        print(f"🆔 Bot ID: {bot_info.id}")
+        print(f"🌐 Session: {SESSION}")
+        
+        # System Features
+        print("\n📊 SYSTEM FEATURES:")
+        print(f"   • 4-Channel FSUB: {'✅' if len(FSUB_CHANNELS) >= 4 else '⚠️'}")
+        print(f"   • Premium System: {'✅' if PREMIUM_ENABLED else '❌'}")
+        print(f"   • Daily Limit: {DAILY_FREE_LIMIT} files")
+        print(f"   • Unique Links: {'✅' if UNIQUE_LINK_ENABLED else '❌'}")
+        print(f"   • Referral System: {'✅' if REFERRAL_ENABLED else '❌'}")
+        
+        # Channel Info
+        print(f"\n📢 CHANNELS:")
+        print(f"   • FSUB Channels: {len(FSUB_CHANNELS)}")
+        print(f"   • File Channel: {FILE_CHANNEL}")
+        print(f"   • Log Channel: {LOG_CHANNEL}")
+        
+        # Admin Info
+        print(f"\n👑 ADMINISTRATORS:")
+        print(f"   • Total Admins: {len(ADMINS)}")
+        if ADMINS:
+            print(f"   • Primary Admin: {ADMINS[0]}")
+        
+        print("\n" + "=" * 50)
+        print("💡 Bot is now ready to use!")
+        print("💡 Use /start to test FSUB system")
+        print("💡 Admins can use /getlink to generate unique links")
+        print("=" * 50)
 
 async def main():
     """Main async function"""
@@ -275,10 +359,6 @@ if __name__ == '__main__':
         # Get event loop
         loop = asyncio.get_event_loop()
         
-        print("=" * 50)
-        print("🚀 Starting VJ Filter Bot")
-        print("=" * 50)
-        
         # Run main function
         loop.run_until_complete(main())
         
@@ -289,3 +369,8 @@ if __name__ == '__main__':
         print(f"\n❌ Fatal error: {e}")
         logging.error(f"Fatal error: {e}")
         print("\nPlease check your configuration and try again.")
+        print("Common issues:")
+        print("1. Check API_ID, API_HASH, and BOT_TOKEN")
+        print("2. Check MongoDB connection string")
+        print("3. Ensure bot is admin in all channels")
+        print("4. Check environment variables")
