@@ -1,90 +1,119 @@
-# Don't Remove Credit @VJ_Bots
-# Subscribe YouTube Channel For Amazing Bot @Tech_VJ
-# Ask Doubt on telegram @KingVJ01
-
+# ============================================
+# ADVANCED 4-CHANNEL FSUB + PREMIUM BOT CONFIG
+# ============================================
 
 import re
+import os
 from os import environ
 from Script import script 
 
 id_pattern = re.compile(r'^.\d+$')
 
-# Bot information
+# ============================================
+# BOT CREDENTIALS (Aapke original)
+# ============================================
 SESSION = environ.get('SESSION', 'TechVJBot')
 API_ID = int(environ.get('API_ID', '30121899'))
 API_HASH = environ.get('API_HASH', 'd43eb6418b1a9a92fb658130394b0f8d')
 BOT_TOKEN = environ.get('BOT_TOKEN', "8407847011:AAFvWe7hjDYwjJwnVXOL1dfB45hqk0fQMTE")
 
-# Pictures for start message
-PICS = (environ.get('PICS', 'https://graph.org/file/ce1723991756e48c35aa1.jpg')).split()
+# ============================================
+# 4-CHANNEL FSUB SYSTEM
+# ============================================
+FSUB_CHANNELS = [
+    int(ch) if id_pattern.search(ch) else ch 
+    for ch in environ.get('FSUB_CHANNELS', '-1003569825863 -1003327001243 -1003155580619 -1003544571934').split()
+]
 
-# Admins & Users
+# Progressive FSUB - Agar 1 join hai toh 3 dikhayega
+FSUB_PROGRESSIVE = bool(environ.get('FSUB_PROGRESSIVE', True))
+
+# FSUB Messages
+FSUB_MSG = environ.get('FSUB_MSG', 'Hello Professor 🎉\n\nYou need to join all my channels to use me\n\nKindly Please join channels...')
+FSUB_AFTER_MSG = environ.get('FSUB_AFTER_MSG', 'Hello Professor 😊\n\nI can store private files in Specified Channel and other users can access it from special link.')
+
+# ============================================
+# PREMIUM & DAILY LIMIT SYSTEM
+# ============================================
+PREMIUM_ENABLED = bool(environ.get('PREMIUM_ENABLED', True))
+DAILY_FREE_LIMIT = int(environ.get('DAILY_FREE_LIMIT', 5))
+FREE_USER_MAX_DOWNLOADS = 5  # Free users can download only 5 files/day
+
+# Premium plans (Days: Price in ₹)
+PREMIUM_PLANS = {
+    1: 30,     # 1 day
+    10: 60,    # 10 days
+    30: 99,    # 1 month
+    90: 249,   # 3 months
+    180: 499,  # 6 months
+    365: 799   # 1 year
+}
+
+# ============================================
+# REFERRAL SYSTEM
+# ============================================
+REFERRAL_ENABLED = bool(environ.get('REFERRAL_ENABLED', True))
+REFERRAL_POINTS_PER_REF = int(environ.get('REFERRAL_POINTS_PER_REF', 1))
+POINTS_TO_DAYS_RATIO = int(environ.get('POINTS_TO_DAYS_RATIO', 1))  # 1 point = 1 day premium
+
+# ============================================
+# UNIQUE LINK GENERATION SYSTEM
+# ============================================
+UNIQUE_LINK_ENABLED = bool(environ.get('UNIQUE_LINK_ENABLED', True))
+LINK_PREFIX = environ.get('LINK_PREFIX', 'https://t.me/')
+LINK_LENGTH = int(environ.get('LINK_LENGTH', 10))
+LINK_EXPIRY_DAYS = int(environ.get('LINK_EXPIRY_DAYS', 7))
+
+# ============================================
+# ADMIN & USERS
+# ============================================
 ADMINS = [int(admin) if id_pattern.search(admin) else admin for admin in environ.get('ADMINS', '8572902738').split()]
 auth_users = [int(user) if id_pattern.search(user) else user for user in environ.get('AUTH_USERS', '').split()]
 AUTH_USERS = (auth_users + ADMINS) if auth_users else []
 
-# Log Channel
+# ============================================
+# CHANNELS & GROUPS
+# ============================================
 LOG_CHANNEL = int(environ.get('LOG_CHANNEL', '-1003636205044'))
-
-# File Channels (4 channels)
 CHANNELS = [int(ch) if id_pattern.search(ch) else ch for ch in environ.get('CHANNELS', '-1003569825863 -1003327001243 -1003155580619 -1003544571934').split()]
 
-# Request to join mode (force subscribe)
+# File Channels
+FILE_CHANNEL = int(environ.get('FILE_CHANNEL', '-1003569825863'))
+
+# Request Channel
 REQUEST_TO_JOIN_MODE = bool(environ.get('REQUEST_TO_JOIN_MODE', True))
 TRY_AGAIN_BTN = bool(environ.get('TRY_AGAIN_BTN', True))
-
-# Auth Channel (first channel as auth)
 auth_channel = environ.get('AUTH_CHANNEL', '-1003569825863')
 AUTH_CHANNEL = int(auth_channel) if auth_channel and id_pattern.search(auth_channel) else None
 
-# Request Channel
-reqst_channel = environ.get('REQST_CHANNEL', '-1003674096367')
-REQST_CHANNEL = int(reqst_channel) if reqst_channel and id_pattern.search(reqst_channel) else None
+# Support
+SUPPORT_CHAT_ID = environ.get('SUPPORT_CHAT_ID', '')
+SUPPORT_CHAT = environ.get('SUPPORT_CHAT', 'vj_bot_disscussion')
 
-# Index Request Channel
-INDEX_REQ_CHANNEL = int(environ.get('INDEX_REQ_CHANNEL', LOG_CHANNEL))
-
-# Support Group
-support_chat_id = environ.get('SUPPORT_CHAT_ID', '')
-SUPPORT_CHAT_ID = int(support_chat_id) if support_chat_id and id_pattern.search(support_chat_id) else None
-
-# File Store Channel
-FILE_STORE_CHANNEL = [int(ch) for ch in (environ.get('FILE_STORE_CHANNEL', '-1003674096367')).split()]
-
-# Delete Channels
-DELETE_CHANNELS = [int(dch) if id_pattern.search(dch) else dch for dch in environ.get('DELETE_CHANNELS', '0').split()]
-
-# MongoDB information - FIXED URL
+# ============================================
+# MONGODB DATABASE
+# ============================================
 DATABASE_URI = environ.get('DATABASE_URI', "mongodb+srv://hackingyashwant_db_user:RjIucgaU6RsJWPRU@cluster0.euy3vsq.mongodb.net/?retryWrites=true&w=majority&ssl=false")
 DATABASE_NAME = environ.get('DATABASE_NAME', "movie_hub_bot")
 COLLECTION_NAME = environ.get('COLLECTION_NAME', 'movies_collection')
 
-MULTIPLE_DATABASE = bool(environ.get('MULTIPLE_DATABASE', False))
+# Premium users collection
+PREMIUM_COLLECTION = environ.get('PREMIUM_COLLECTION', 'premium_users')
+USAGE_COLLECTION = environ.get('USAGE_COLLECTION', 'daily_usage')
 
-# Other database URIs (if multiple DB is true)
-O_DB_URI = environ.get('O_DB_URI', "")
-F_DB_URI = environ.get('F_DB_URI', "")
-S_DB_URI = environ.get('S_DB_URI', "")
-
-# Premium and Referral Settings
-PREMIUM_AND_REFERAL_MODE = bool(environ.get('PREMIUM_AND_REFERAL_MODE', False))
-REFERAL_COUNT = int(environ.get('REFERAL_COUNT', '20'))
-REFERAL_PREMEIUM_TIME = environ.get('REFERAL_PREMEIUM_TIME', '1month')
+# ============================================
+# PAYMENT SETTINGS
+# ============================================
 PAYMENT_QR = environ.get('PAYMENT_QR', 'https://graph.org/file/ce1723991756e48c35aa1.jpg')
-PAYMENT_TEXT = environ.get('PAYMENT_TEXT', '<b>- біАбі†біА…™ ЯбіА Щ ЯбіЗ біШ ЯбіА…іs - \n\n- 30 Аs - 1 бі°біЗбіЗбіЛ\n- 50 Аs - 1 біНбіП…ібіЫ Ьs\n- 120 Аs - 3 біНбіП…ібіЫ Ьs\n- 220 Аs - 6 біНбіП…ібіЫ Ьs\n\nрЯОБ біШ АбіЗбіН…™біЬбіН "УбіЗбіАбіЫбіЬ АбіЗs рЯОБ\n\nвЧЛ …ібіП …ібіЗбіЗбіЕ біЫбіП бі†біЗ А…™"У П\nвЧЛ …ібіП …ібіЗбіЗбіЕ біЫбіП біПбіШбіЗ…і Я…™…ібіЛ\nвЧЛ біЕ…™ АбіЗбіДбіЫ "У…™ ЯбіЗs\nвЧЛ біАбіЕ-"У АбіЗбіЗ біЗxбіШбіЗ А…™біЗ…ібіДбіЗ\nвЧЛ Ь…™…ҐЬ-sбіШбіЗбіЗбіЕ біЕбіПбі°…іЯбіПбіАбіЕ Я…™…ібіЛ\nвЧЛ біНбіЬЯбіЫ…™-біШ ЯбіАПбіЗА sбіЫАбіЗбіАбіН…™…і…Ґ Я…™…ібіЛs\nвЧЛ біЬ…іЯ…™біН…™біЫбіЗбіЕ біНбіПбі†…™біЗs & sбіЗА…™біЗs\nвЧЛ кЬ∞біЬЯ Я біАбіЕбіН…™…і sбіЬбіШбіШбіПАбіЫ\nвЧЛ АбіЗ«ЂбіЬбіЗsбіЫ бі°…™Я Я ЩбіЗ біДбіПбіНбіШЯбіЗбіЫбіЗбіЕ …™…і 1Ь …™кЬ∞ біАбі†біА…™ЯбіАЩ ЯбіЗ\n\nвЬ® біЬбіШ…™ …™біЕ - <code>demo@okxyz</code>\n\nбіДЯ…™біДбіЛ біЫбіП біДЬбіЗбіДбіЛ ПбіПбіЬА біАбіДбіЫ…™бі†біЗ біШЯбіА…і /myplan\n\nрЯТҐ біНбіЬsбіЫ sбіЗ…ібіЕ sбіДАбіЗбіЗ…іsЬбіПбіЫ біА"УбіЫбіЗА біШбіАПбіНбіЗ…ібіЫ\n\nвАЉпЄП біА"УбіЫбіЗА sбіЗ…ібіЕ…™…і…Ґ біА sбіДАбіЗбіЗ…іsЬбіПбіЫ біШЯбіЗбіАsбіЗ …Ґ…™бі†біЗ біЬs sбіПбіНбіЗ біЫ…™біНбіЗ біЫбіП біАбіЕбіЕ ПбіПбіЬ …™…і біЫЬбіЗ біШАбіЗбіН…™біЬбіН</b>')
+OWNER_UPI_ID = environ.get('OWNER_UPI_ID', 'demo@okxyz')
+PAYMENT_METHODS = ['UPI', 'GPay', 'PhonePe', 'PayTM', 'QR Code']
 
-# Clone Information
-CLONE_MODE = bool(environ.get('CLONE_MODE', False))
-CLONE_DATABASE_URI = environ.get('CLONE_DATABASE_URI', "")
-PUBLIC_FILE_CHANNEL = environ.get('PUBLIC_FILE_CHANNEL', '')
+# ============================================
+# BOT SETTINGS
+# ============================================
+PICS = (environ.get('PICS', 'https://graph.org/file/ce1723991756e48c35aa1.jpg')).split()
 
-# Links
-GRP_LNK = environ.get('GRP_LNK', 'https://t.me/+Jd1FebsBfFBiZjc1')
-CHNL_LNK = environ.get('CHNL_LNK', 'https://t.me/+IsEpEZnOKN45NjFl')
-SUPPORT_CHAT = environ.get('SUPPORT_CHAT', 'vj_bot_disscussion')
-OWNER_LNK = environ.get('OWNER_LNK', 'https://t.me/kingvj01')
-
-# True or False settings
+# True/False settings
 AI_SPELL_CHECK = bool(environ.get('AI_SPELL_CHECK', True))
 PM_SEARCH = bool(environ.get('PM_SEARCH', True))
 BUTTON_MODE = bool(environ.get('BUTTON_MODE', True))
@@ -101,22 +130,17 @@ PUBLIC_FILE_STORE = bool(environ.get('PUBLIC_FILE_STORE', True))
 NO_RESULTS_MSG = bool(environ.get("NO_RESULTS_MSG", False))
 USE_CAPTION_FILTER = bool(environ.get('USE_CAPTION_FILTER', True))
 
-# Token Verification
-VERIFY = bool(environ.get('VERIFY', False))
-VERIFY_SHORTLINK_URL = environ.get('VERIFY_SHORTLINK_URL', '')
-VERIFY_SHORTLINK_API = environ.get('VERIFY_SHORTLINK_API', '')
-VERIFY_TUTORIAL = environ.get('VERIFY_TUTORIAL', '')
-VERIFY_SECOND_SHORTNER = bool(environ.get('VERIFY_SECOND_SHORTNER', False))
-VERIFY_SND_SHORTLINK_URL = environ.get('VERIFY_SND_SHORTLINK_URL', '')
-VERIFY_SND_SHORTLINK_API = environ.get('VERIFY_SND_SHORTLINK_API', '')
+# ============================================
+# LINKS
+# ============================================
+GRP_LNK = environ.get('GRP_LNK', 'https://t.me/+Jd1FebsBfFBiZjc1')
+CHNL_LNK = environ.get('CHNL_LNK', 'https://t.me/+IsEpEZnOKN45NjFl')
+SUPPORT_CHAT = environ.get('SUPPORT_CHAT', 'vj_bot_disscussion')
+OWNER_LNK = environ.get('OWNER_LNK', 'https://t.me/kingvj01')
 
-# Shortlink Info
-SHORTLINK_MODE = bool(environ.get('SHORTLINK_MODE', False))
-SHORTLINK_URL = environ.get('SHORTLINK_URL', '')
-SHORTLINK_API = environ.get('SHORTLINK_API', '')
-TUTORIAL = environ.get('TUTORIAL', '')
-
-# Others
+# ============================================
+# OTHER SETTINGS
+# ============================================
 CACHE_TIME = int(environ.get('CACHE_TIME', 1800))
 MAX_B_TN = environ.get("MAX_B_TN", "5")
 PORT = environ.get("PORT", "8080")
@@ -126,14 +150,9 @@ BATCH_FILE_CAPTION = environ.get("BATCH_FILE_CAPTION", CUSTOM_FILE_CAPTION)
 IMDB_TEMPLATE = environ.get("IMDB_TEMPLATE", f"{script.IMDB_TEMPLATE_TXT}")
 MAX_LIST_ELM = environ.get("MAX_LIST_ELM", None)
 
-# Choose Option Settings 
-LANGUAGES = ["malayalam", "mal", "tamil", "tam", "english", "eng", "hindi", "hin", "telugu", "tel", "kannada", "kan"]
-SEASONS = ["season 1", "season 2", "season 3", "season 4", "season 5", "season 6", "season 7", "season 8", "season 9", "season 10"]
-EPISODES = ["E01", "E02", "E03", "E04", "E05", "E06", "E07", "E08", "E09", "E10", "E11", "E12", "E13", "E14", "E15", "E16", "E17", "E18", "E19", "E20", "E21", "E22", "E23", "E24", "E25", "E26", "E27", "E28", "E29", "E30", "E31", "E32", "E33", "E34", "E35", "E36", "E37", "E38", "E39", "E40"]
-QUALITIES = ["360p", "480p", "720p", "1080p", "1440p", "2160p"]
-YEARS = ["1900", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998", "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"]
-
-# Online Stream and Download
+# ============================================
+# STREAM MODE
+# ============================================
 STREAM_MODE = bool(environ.get('STREAM_MODE', True))
 MULTI_CLIENT = False
 SLEEP_THRESHOLD = int(environ.get('SLEEP_THRESHOLD', '60'))
@@ -144,23 +163,35 @@ else:
     ON_HEROKU = False
 URL = environ.get("URL", "https://your-app-name.onrender.com/")
 
-# Rename Info
-RENAME_MODE = bool(environ.get('RENAME_MODE', False))
-
-# Auto Approve Info
-AUTO_APPROVE_MODE = bool(environ.get('AUTO_APPROVE_MODE', False))
-
-# Start Command Reactions
+# ============================================
+# REACTIONS
+# ============================================
 REACTIONS = ["рЯ§Э", "рЯШЗ", "рЯ§Ч", "рЯШН", "рЯСН", "рЯОЕ", "рЯШР", "рЯ•∞", "рЯ§©", "рЯШ±", "рЯ§£", "рЯШШ", "рЯСП", "рЯШЫ", "рЯШИ", "рЯОЙ", "вЪ°пЄП", "рЯЂ°", "рЯ§У", "рЯШО", "рЯПЖ", "рЯФ•", "рЯ§≠", "рЯМЪ", "рЯЖТ", "рЯСї", "рЯШБ"]
 
-# Database URIs
-if MULTIPLE_DATABASE == False:
-    USER_DB_URI = DATABASE_URI
-    OTHER_DB_URI = DATABASE_URI
-    FILE_DB_URI = DATABASE_URI
-    SEC_FILE_DB_URI = DATABASE_URI
-else:
-    USER_DB_URI = DATABASE_URI
-    OTHER_DB_URI = O_DB_URI
-    FILE_DB_URI = F_DB_URI
-    SEC_FILE_DB_URI = S_DB_URI
+# ============================================
+# VALIDATION
+# ============================================
+def validate_channels():
+    """Validate that we have exactly 4 channels"""
+    if len(FSUB_CHANNELS) < 4:
+        print(f"⚠️ WARNING: Only {len(FSUB_CHANNELS)} FSUB channels configured. Need 4 channels.")
+    elif len(FSUB_CHANNELS) > 4:
+        print(f"⚠️ WARNING: {len(FSUB_CHANNELS)} FSUB channels configured. Using first 4.")
+        global FSUB_CHANNELS
+        FSUB_CHANNELS = FSUB_CHANNELS[:4]
+    
+    print(f"✅ FSUB System: {len(FSUB_CHANNELS)} channels configured")
+
+# Run validation
+validate_channels()
+
+print(f"""
+🤖 BOT CONFIGURATION LOADED
+===========================
+📊 FSUB Channels: {len(FSUB_CHANNELS)}/4
+⭐ Premium System: {'ENABLED' if PREMIUM_ENABLED else 'DISABLED'}
+🎯 Daily Free Limit: {DAILY_FREE_LIMIT} files
+🔗 Unique Links: {'ENABLED' if UNIQUE_LINK_ENABLED else 'DISABLED'}
+👑 Admins: {len(ADMINS)}
+📁 File Channel: {FILE_CHANNEL}
+""")
